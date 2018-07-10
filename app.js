@@ -1,55 +1,83 @@
-function animateElement(element, start, end, duration){
-    return new Promise((resolve, reject)=>{ //resolve: Para completar promesas. reject: Para rechazarlas. (Como then y catch). NO SON PALABRAS RESERVADAS.
-        const delta = (end - start)*30/duration; //Distancia que va a recorrer cada elemento x 40 (milisegundos) / duración 
-        element.style.left = start; //start parte desde la izquierda
+function animateElement(element, start, end, duration, direction) {
+    return new Promise((resolve, reject) => {
+        const delta = (end - start) * 30 / duration;
+        element.style[direction] = start;
         let counter = 0;
-        const loop = setInterval(()=>{ //función itineraria
+        const loop = setInterval(() => {
             const currentPosition = start + delta * counter++;
-            element.style.left = currentPosition;
-            if(start < end && currentPosition >= end){
+            element.style[direction] = currentPosition;
+            if (start < end && currentPosition >= end) {
                 clearInterval(loop);
-                resolve(); //Llama a then cuando termina la animación
-            }else if(start > end && currentPosition <= end){
+                resolve(); //Llama a then
+            } else if (start > end && currentPosition <= end) {
                 clearInterval(loop);
-                resolve(); //Llama a then cuando termina la animación
+                resolve();
             }
-        }, 30);// ejecuta una funcion cada cierto tiempo
+
+        }, 30); //ejecuta una funcion cada cierto tiempo
+
     });
 }
 
 // Somos las programadoras de la promise
-//====================== Promise =====================
+// ====================== Promise =================
 // Somos las programadoras usuarias de la promise
-/*
+
 const allImg = document.getElementsByTagName("img");
-console.log("Comienza promesa");
-animateElement(allImg[0], -200, 500, 3000).then(()=>{ //Dentro de este then, pongo otra promesa
-    console.log("Terminó la animación de doge");
-    return animateElement(allImg[1], -200, 500, 6000);  //Esta es la otra promesa, que tiene su then propio
-}).then(()=>{
-    console.log("Terminó la animación de cate");
-    return animateElement(allImg[0], -200, 500, 3000);//Aqu´íí apilo otra promesa con su propio then
-}).then(()=>{
-    console.log("Terminó la segunda animación del doge");
-}).catch(()=>{
+let offsetWidth = document.getElementById("place").offsetWidth;
+let height = 460;
+// console.log('Comienza promesa');
+// animateElement(allImg[0], -200, 500, 3000).then(() => {
+//     console.log("Terminó la animación de doge");
+//     return animateElement(allImg[1], -200, 500, 6000);
+// }).then(() => {
+//     console.log("Terminó la animación de cate");
+// }).catch(() => {
 
-});
-console.log("Holi soy código después de la promesa"); //Esta se ejecuta de manera asíncrona, por lo que aparece antes que termine la animación*/
+// });
 
+// console.log('Holi soy código después de la promesa');
 
-//PARALELISMO
-Promise.all([ //Las imágenes se mueven de izquierda a derecha
-    animateElement(allImg[0], -200, 600, 3000),
-    animateElement(allImg[1], -200, 600, 6000)
-]).then(()=>{
-    console.log("Terminaron AMBAS animaciones");
-    return Promise.all([ //Retornar promesa que se ejecutará en el próximo then
-        //Las imágenes se mueven de derecha a izquierda
-        animateElement(allImg[0], 600, -200, 3000),
-        animateElement(allImg[1], 600, -200, 6000)
-    ]);
-}).then(()=>{
-    console.log("Doge y cate se devolvieron");
-}).catch(()=>{
+// Promise.all([
+//     animateElement(allImg[0], -200, 600, 3000),
+//     animateElement(allImg[1], -200, 600, 6000)
+// ]).then(() => {
+//     console.log("Terminaron AMBAS animaciones");
+//     return Promise.all([
+//         animateElement(allImg[0], 600, -200, 3000),
+//         animateElement(allImg[1], 600, -200, 3000)
+//     ]);
+// }).then(() => {
+//     console.log("Tom y Jerry se devolvieron");
+// }).catch(() => {
 
-});
+// });
+
+//=================================
+
+Promise.all([
+        animateElement(allImg[0], 0, offsetWidth, 4000, 'left'),
+        animateElement(allImg[1], 50, offsetWidth, 4000, 'left')
+    ]).then(() => { //Izquierda
+        console.log("Terminaron hacia la izquierda");
+        return Promise.all([
+            animateElement(allImg[0], 0, height, 4000, 'top'),
+            animateElement(allImg[1], 100, height, 4000, 'top')
+        ]);
+    }).then(() => { //Abajo
+        console.log("Terminaron hacia abajo");
+        return Promise.all([
+            animateElement(allImg[0], offsetWidth, 0, 4000, 'left'),
+            animateElement(allImg[1], offsetWidth, 50, 4000, 'left')
+        ]);
+    }).then(() => { //Derecha
+        console.log("Terminaron hacia la derecha");
+        return Promise.all([
+            animateElement(allImg[0], height, 0, 4000, 'top'),
+            animateElement(allImg[1], height, 50, 4000, 'top')
+        ]);
+        console.log("Tomy y Jerry se devolvieron");
+    })
+    .catch(() => {
+
+    });
